@@ -1,11 +1,15 @@
 import React, {Component} from 'react';
-import CircularProgress from 'material-ui/CircularProgress'
+
+// material-ui imports
+import CircularProgress from 'material-ui/CircularProgress';
 import {grey200} from 'material-ui/styles/colors';
 import {deepOrange500} from 'material-ui/styles/colors';
 import FlatButton from 'material-ui/FlatButton';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
+import Drawer from 'material-ui/Drawer';
+import Divider from 'material-ui/Divider';
 
 var Transaction = require('./Transaction.js');
 // Required for tap event
@@ -40,6 +44,7 @@ class App extends Component {
 
     this.state = {
       open: false,
+      drawerOpen: false,
     };
   }
 
@@ -47,6 +52,7 @@ class App extends Component {
   handleRequestClose() {
     this.setState({
       open: false,
+      drawerOpen: false,
     });
   }
 
@@ -92,6 +98,8 @@ class App extends Component {
 
   }
 
+  toggleDrawer = () => this.setState({drawerOpen: !this.state.drawerOpen});
+
   render() {
     const standardActions = (
       <FlatButton
@@ -116,8 +124,27 @@ class App extends Component {
                 className="appBar"
                 style={styles.appBar}
                 title="Your Transaction History"
+                iconElementRight={<FlatButton label="Filter" />}
+                label="Open Drawer"
+                onTouchTap={this.toggleDrawer}
             >
             </AppBar>
+
+            <Drawer
+                docked={false}
+                width={300}
+                open={this.state.drawerOpen}
+                onRequestChange={(drawerOpen) => this.setState({drawerOpen})}
+                >
+                Categories
+                <Divider/>
+                {this.data.categories.map(category => (
+                    <div>
+                        {category.toLowerCase().split('_').join(' ').replace(/\b\w/g, function(l) { return l.toUpperCase() })}
+                    </div>
+                ))}
+            </Drawer>
+
             <h2>
                 Total Balance:
                 {" $" + this.data.accounts.map(account => (
