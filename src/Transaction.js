@@ -12,7 +12,7 @@ const styles = {
   paper: {
       textAlign: 'left',
       fontWeight: 300,
-      width: '80%',
+      width: '70%',
       margin: 'auto',
       paddingTop: 25,
       paddingRight: 20,

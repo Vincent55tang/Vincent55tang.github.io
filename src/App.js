@@ -11,6 +11,8 @@ import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import Divider from 'material-ui/Divider';
 import Checkbox from 'material-ui/Checkbox';
+import IconButton from 'material-ui/IconButton';
+import ActionSwapVert from 'material-ui/svg-icons/action/swap-vert';
 
 var Transaction = require('./Transaction.js');
 
@@ -29,6 +31,18 @@ const styles = {
   },
   clrBtn: {
       width: '100%'
+  },
+  dateSort: {
+      float: 'right',
+  },
+  filterType: {
+      fontSize: 20,
+      fontWeight: 300,
+      padding: 20,
+  },
+  checkbox: {
+      margin: 10,
+      fontWeight: 100,
   }
 };
 
@@ -49,6 +63,7 @@ class App extends Component {
       open: false,
       drawerOpen: false,
       activeFilters: [],
+      dateDesc: true,
     };
   }
 
@@ -73,17 +88,29 @@ class App extends Component {
 
   }
 
-  filteredTransactions(filters) {
+  filteredTransactions(filters, dateDesc) {
       var filtered = filters.length === 0 ? this.data.transactionData.transactions :
       this.data.transactionData.transactions.filter((transaction) => {
           // Kind of slow
           return filters.includes(transaction.category) || filters.includes(transaction.accountId)
       });
 
-      // TODO: Sort by date
+      if (dateDesc) {
+          filtered = filtered.sort((a,b) => {
+              return new Date(b.transactionDate) - new Date(a.transactionDate)
+          })
+      } else {
+          filtered = filtered.sort((a,b) => {
+              return new Date(a.transactionDate) - new Date(b.transactionDate)
+          })
+      }
 
       return filtered;
 
+  }
+
+  displayNicely(string) {
+      return string.toLowerCase().split('_').join(' ').replace(/\b\w/g, function(l) { return l.toUpperCase() })
   }
 
   toggleDrawer = () => this.setState({drawerOpen: !this.state.drawerOpen});
@@ -102,6 +129,8 @@ class App extends Component {
 
   clearFilters = () => this.setState({activeFilters: []});
 
+  reorder = () => this.setState({dateDesc: !this.state.dateDesc})
+
   render() {
     if (this.data === undefined) {
         return (
@@ -117,7 +146,9 @@ class App extends Component {
             <AppBar
                 className="appBar"
                 style={styles.appBar}
-                title="Your Transaction History"
+                title={"My Balance $" + this.data.accounts.map(account => (
+                    account.balance
+                )).reduce((a,b) => a+b, 0) + " CAD"}
                 iconElementRight={<FlatButton label="Filter" onTouchTap={this.toggleDrawer} />}
                 label="Open Drawer"
             >
@@ -134,26 +165,31 @@ class App extends Component {
                 <div>
                     <FlatButton label="Clear" onTouchTap={this.clearFilters} style={styles.clrBtn} />
                 </div>
-                Accounts
+                <div className="filterType" style={styles.filterType}>
+                    Accounts
+                </div>
                 <Divider/>
                 {this.data.accounts.map(account => (
                     <div>
                         <Checkbox
-                            label={account.accountName.toLowerCase().split('_').join(' ').replace(/\b\w/g, function(l) { return l.toUpperCase() })}
+                            style={styles.checkbox}
+                            label={this.displayNicely(account.accountName)}
                             checked={this.state.activeFilters.includes(account.accountId)}
                             onCheck={() => this.toggleFilter(account.accountId)}
                             key={account.accountName}
                         />
                     </div>
                 ))}
-
-                Categories
+                <div className="filterType" style={styles.filterType}>
+                    Categories
+                </div>
                 <Divider/>
 
                 {this.data.categories.map(category => (
                     <div>
                         <Checkbox
-                            label={category.toLowerCase().split('_').join(' ').replace(/\b\w/g, function(l) { return l.toUpperCase() })}
+                            style={styles.checkbox}
+                            label={this.displayNicely(category)}
                             checked={this.state.activeFilters.includes(category)}
                             onCheck={() => this.toggleFilter(category)}
                             key={category}
@@ -163,14 +199,15 @@ class App extends Component {
 
             </Drawer>
 
-            <h2>
-                Total Balance:
-                {" $" + this.data.accounts.map(account => (
-                    account.balance
-                )).reduce((a,b) => a+b, 0) + " CAD"}
-            </h2>
+                <IconButton
+                    style={styles.dateSort}
+                    onTouchTap={() => this.reorder()}
+                >
+                    <ActionSwapVert/>
+                </IconButton>
 
-            {this.filteredTransactions(this.state.activeFilters).map(transaction => (
+            {console.log(this.filteredTransactions(this.state.activeFilters, this.state.dateDesc))}
+            {this.filteredTransactions(this.state.activeFilters, this.state.dateDesc).map(transaction => (
                 <Transaction
                     key={transaction.transactionId}
                     transaction={transaction}
