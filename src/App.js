@@ -10,6 +10,10 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import Divider from 'material-ui/Divider';
+import Checkbox from 'material-ui/Checkbox';
+
+// checkbox group import
+// not needed
 
 var Transaction = require('./Transaction.js');
 // Required for tap event
@@ -40,11 +44,11 @@ class App extends Component {
     this.handleRequestClose = this.handleRequestClose.bind(this);
     this.handleTouchTap = this.handleTouchTap.bind(this);
     this.data = undefined;
-    this.activeFilters = undefined;
 
     this.state = {
       open: false,
       drawerOpen: false,
+      activeFilters: [],
     };
   }
 
@@ -67,19 +71,6 @@ class App extends Component {
       this.fetchData();
   }
 
-  filterOff(filter) {
-      this.activeFilters.push(filter);
-      var filtered = this.data.transactionData.transactions.filter(transaction => {
-          this.activeFilters.includes(transaction.category)
-      })
-      this.setState({transactions: filtered});
-  }
-
-  clearFilters() {
-      this.activeFilters = [];
-      this.setState({transactions: this.data.transactionData.transactions});
-  }
-
   fetchData() {
 
       const request = new Request('http://demo7235469.mockable.io/transactions');
@@ -88,7 +79,6 @@ class App extends Component {
       fetch(request)
       .then((response) => response.json())
       .then((responseJSON) => {
-          console.log(responseJSON)
           self.data = responseJSON;
           self.setState({transactions: responseJSON.transactionData.transactions});
       })
@@ -98,7 +88,29 @@ class App extends Component {
 
   }
 
+  filteredTransactions(filters) {
+      console.log('swag');
+      return filters.length === 0 ? this.data.transactionData.transactions :
+      this.data.transactionData.transactions.filter((transaction) => {
+          return this.state.activeFilters.includes(transaction.category)
+      });
+  }
+
   toggleDrawer = () => this.setState({drawerOpen: !this.state.drawerOpen});
+
+  toggleFilter = (filter) => {
+      var activeFilters = this.state.activeFilters;
+
+      if (activeFilters.includes(filter)) {
+          activeFilters.splice(activeFilters.indexOf(filter), 1);
+      } else {
+          activeFilters.push(filter);
+      }
+
+      this.setState({activeFilters: activeFilters});
+  }
+
+  clearFilters = () => this.setState({activeFilters: []});
 
   render() {
     const standardActions = (
@@ -124,25 +136,47 @@ class App extends Component {
                 className="appBar"
                 style={styles.appBar}
                 title="Your Transaction History"
-                iconElementRight={<FlatButton label="Filter" />}
+                iconElementRight={<FlatButton label="Filter" onTouchTap={this.toggleDrawer} />}
                 label="Open Drawer"
-                onTouchTap={this.toggleDrawer}
             >
             </AppBar>
 
             <Drawer
+                style={styles.drawer}
                 docked={false}
                 width={300}
                 open={this.state.drawerOpen}
                 onRequestChange={(drawerOpen) => this.setState({drawerOpen})}
-                >
-                Categories
+            >
+
+                <div>
+                    <FlatButton label="Clear" onTouchTap={this.clearFilters} />
+                </div>
+                Accounts
                 <Divider/>
-                {this.data.categories.map(category => (
+                {this.data.accounts.map(account => (
                     <div>
-                        {category.toLowerCase().split('_').join(' ').replace(/\b\w/g, function(l) { return l.toUpperCase() })}
+                        <Checkbox
+                            label={account.accountName.toLowerCase().split('_').join(' ').replace(/\b\w/g, function(l) { return l.toUpperCase() })}
+                            checked={this.state.activeFilters.includes(account)}
+                            onCheck={(account) => this.toggleFilter(account)}
+                        />
                     </div>
                 ))}
+
+                Categories
+                <Divider/>
+
+                {this.data.categories.map(category => (
+                    <div>
+                        <Checkbox
+                            label={category.toLowerCase().split('_').join(' ').replace(/\b\w/g, function(l) { return l.toUpperCase() })}
+                            checked={this.state.activeFilters.includes(category)}
+                            onCheck={() => this.toggleFilter(category)}
+                        />
+                    </div>
+                ))}
+
             </Drawer>
 
             <h2>
@@ -151,12 +185,13 @@ class App extends Component {
                     account.balance
                 )).reduce((a,b) => a+b, 0) + " CAD"}
             </h2>
-              {this.state.transactions.map(transaction => (
-                  <Transaction
-                        key={transaction.transactionId}
-                        transaction={transaction}
-                  >
-                  </Transaction>
+
+            {this.filteredTransactions(this.state.activeFilters).map(transaction => (
+                <Transaction
+                    key={transaction.transactionId}
+                    transaction={transaction}
+                >
+                </Transaction>
 
               ))}
             </div>
