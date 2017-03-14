@@ -22,11 +22,11 @@ const styles = {
 
       deposit: {
           color: 'blue',
-          fontSize: '20',
+          fontSize: 20,
       },
       withdrawal: {
           color: 'yellow',
-          fontSize: '20',
+          fontSize: 20,
       },
       desc: {
           float: 'left',

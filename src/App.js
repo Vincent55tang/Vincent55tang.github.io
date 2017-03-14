@@ -12,10 +12,8 @@ import Drawer from 'material-ui/Drawer';
 import Divider from 'material-ui/Divider';
 import Checkbox from 'material-ui/Checkbox';
 
-// checkbox group import
-// not needed
-
 var Transaction = require('./Transaction.js');
+
 // Required for tap event
 import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
@@ -28,6 +26,9 @@ const styles = {
   },
   appBar: {
       fontWeight: 300
+  },
+  clrBtn: {
+      width: '100%'
   }
 };
 
@@ -41,8 +42,7 @@ class App extends Component {
   constructor(props, context) {
     super(props, context);
 
-    this.handleRequestClose = this.handleRequestClose.bind(this);
-    this.handleTouchTap = this.handleTouchTap.bind(this);
+    // Store the json data for convenience so we don't keep making requests
     this.data = undefined;
 
     this.state = {
@@ -50,21 +50,6 @@ class App extends Component {
       drawerOpen: false,
       activeFilters: [],
     };
-  }
-
-  // Don't need this
-  handleRequestClose() {
-    this.setState({
-      open: false,
-      drawerOpen: false,
-    });
-  }
-
-  // Don't need this
-  handleTouchTap() {
-    this.setState({
-      open: true,
-    });
   }
 
   componentDidMount() {
@@ -89,11 +74,16 @@ class App extends Component {
   }
 
   filteredTransactions(filters) {
-      console.log('swag');
-      return filters.length === 0 ? this.data.transactionData.transactions :
+      var filtered = filters.length === 0 ? this.data.transactionData.transactions :
       this.data.transactionData.transactions.filter((transaction) => {
-          return this.state.activeFilters.includes(transaction.category)
+          // Kind of slow
+          return filters.includes(transaction.category) || filters.includes(transaction.accountId)
       });
+
+      // TODO: Sort by date
+
+      return filtered;
+
   }
 
   toggleDrawer = () => this.setState({drawerOpen: !this.state.drawerOpen});
@@ -113,14 +103,6 @@ class App extends Component {
   clearFilters = () => this.setState({activeFilters: []});
 
   render() {
-    const standardActions = (
-      <FlatButton
-        label="Ok"
-        primary={true}
-        onTouchTap={this.handleRequestClose}
-      />
-    );
-
     if (this.data === undefined) {
         return (
           <MuiThemeProvider muiTheme={muiTheme}>
@@ -150,7 +132,7 @@ class App extends Component {
             >
 
                 <div>
-                    <FlatButton label="Clear" onTouchTap={this.clearFilters} />
+                    <FlatButton label="Clear" onTouchTap={this.clearFilters} style={styles.clrBtn} />
                 </div>
                 Accounts
                 <Divider/>
@@ -158,8 +140,9 @@ class App extends Component {
                     <div>
                         <Checkbox
                             label={account.accountName.toLowerCase().split('_').join(' ').replace(/\b\w/g, function(l) { return l.toUpperCase() })}
-                            checked={this.state.activeFilters.includes(account)}
-                            onCheck={(account) => this.toggleFilter(account)}
+                            checked={this.state.activeFilters.includes(account.accountId)}
+                            onCheck={() => this.toggleFilter(account.accountId)}
+                            key={account.accountName}
                         />
                     </div>
                 ))}
@@ -173,6 +156,7 @@ class App extends Component {
                             label={category.toLowerCase().split('_').join(' ').replace(/\b\w/g, function(l) { return l.toUpperCase() })}
                             checked={this.state.activeFilters.includes(category)}
                             onCheck={() => this.toggleFilter(category)}
+                            key={category}
                         />
                     </div>
                 ))}
