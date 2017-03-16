@@ -14,7 +14,6 @@ import ActionSwapVert from 'material-ui/svg-icons/action/swap-vert';
 
 var Transaction = require('./Transaction.js');
 var displayNicely = require('./helpers.js');
-var MediaQuery = require('react-responsive');
 
 // Required for tap event
 import injectTapEventPlugin from 'react-tap-event-plugin';

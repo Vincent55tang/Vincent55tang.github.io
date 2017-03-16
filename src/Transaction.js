@@ -47,6 +47,9 @@ const styles = {
       },
       date: {
           fontWeight: 300,
+          year: {
+              color: grey500,
+          }
       },
       account: {
           fontWeight: 300,
@@ -80,9 +83,11 @@ class Transaction extends Component {
         date = date.split('-');
         return (
             <span>
-                <div> {date[0]} </div>
-                <span className="month"> {this.months[date[1]]} </span>
-                <span> {date[2]} </span>
+                <div>
+                    <span> {this.months[date[1]]} </span>
+                    <span> {date[2]} </span>
+                </div>
+                <div style={styles.paper.date.year}> {date[0]} </div>
             </span>
         )
     }
