@@ -30,6 +30,7 @@ const styles = {
   },
   appBar: {
       backgroundColor: lightGreen500,
+      textAlign: 'center',
   },
   clrBtn: {
       width: '100%'
@@ -45,7 +46,12 @@ const styles = {
   checkbox: {
       margin: 10,
       fontWeight: 100,
-  }
+  },
+  balance: {
+      fontSize: '10px',
+      height: '5px',
+      color: grey200,
+  },
 };
 
 class App extends Component {
@@ -143,6 +149,20 @@ class App extends Component {
         )
     } else {
 
+        let title = (
+
+            <span>
+            <div className="balance" style={styles.balance}>
+                YOUR BALANCE
+            </div>
+            <div>
+                {"$" + this.data.accounts.map(account => (
+                    account.balance
+                )).reduce((a,b) => a+b, 0) + " CAD"}
+            </div>
+            </span>
+        )
+
         return (
             <div className="App">
               <MuiThemeProvider>
@@ -150,9 +170,7 @@ class App extends Component {
                 <AppBar
                     className="appBar"
                     style={styles.appBar}
-                    title={"$" + this.data.accounts.map(account => (
-                        account.balance
-                    )).reduce((a,b) => a+b, 0) + " CAD"}
+                    title={title}
                     iconElementRight={<FlatButton label="Filter" onTouchTap={this.toggleDrawer} />}
                     label="Open Drawer"
                 >
