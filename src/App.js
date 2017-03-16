@@ -180,7 +180,6 @@ class App extends Component {
                                 label={displayNicely(account.accountName)}
                                 checked={this.state.activeFilters.includes(account.accountId)}
                                 onCheck={() => this.toggleFilter(account.accountId)}
-                                key={account.accountName}
                             />
                         </div>
                     ))}
@@ -210,7 +209,6 @@ class App extends Component {
                         <ActionSwapVert/>
                     </IconButton>
 
-                {console.log(this.filteredTransactions(this.state.activeFilters, this.state.dateDesc))}
                 {this.filteredTransactions(this.state.activeFilters, this.state.dateDesc).map(transaction => (
                     <Transaction
                         key={transaction.transactionId}

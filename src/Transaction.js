@@ -42,6 +42,7 @@ const styles = {
           color: grey500,
           float: 'left',
           width: '100%',
+          fontWeight: 300,
       },
       date: {
           fontWeight: 300,
