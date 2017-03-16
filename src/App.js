@@ -69,7 +69,7 @@ class App extends Component {
 
   fetchData() {
 
-      const request = new Request('http://demo7235469.mockable.io/transactions');
+      const request = new Request('https://demo7235469.mockable.io/transactions');
       var self = this;
 
       fetch(request)
