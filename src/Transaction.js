@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import Paper from 'material-ui/Paper';
+import {grey500, lightGreen500} from 'material-ui/styles/colors';
+
+var displayNicely = require('./helpers.js');
 
 const styles = {
   container: {
@@ -11,35 +14,40 @@ const styles = {
   },
   paper: {
       textAlign: 'left',
-      fontWeight: 300,
       width: '70%',
       margin: 'auto',
-      paddingTop: 25,
-      paddingRight: 20,
-      paddingBottom:25,
-      paddingLeft: 20,
-      marginTop: 20,
+      paddingTop: 20,
+      paddingRight: 10,
+      paddingBottom:20,
+      paddingLeft: 10,
+      marginTop: 15,
 
       deposit: {
-          color: 'blue',
+          color: lightGreen500,
           fontSize: 20,
+          fontWeight: 500,
+          float: 'right'
       },
       withdrawal: {
-          color: 'yellow',
           fontSize: 20,
+          fontWeight: 500,
+          float: 'right'
       },
       desc: {
           float: 'left',
-      },
-      runningBalance: {
-          color: 'red',
-          float: 'left',
+          width: '100%',
+          fontWeight: 500,
       },
       category: {
-          color: 'green',
+          color: grey500,
+          float: 'left',
+          width: '100%',
       },
       date: {
-          fontWeight: 500,
+          fontWeight: 300,
+      },
+      account: {
+          fontWeight: 300,
       },
 
   }
@@ -54,27 +62,28 @@ class Transaction extends Component {
 
     render() {
         var action = this.props.transaction.amount >= 0 ? "deposit" : "withdrawal"
+        var sign = this.props.transaction.amount >= 0 ? "+" : "-"
         return (
             <Paper style={styles.paper} className="transaction">
                 <div className={action} style={eval("styles.paper." + action)}>
-                    {action.toUpperCase() + ": "}
-                    {"$" + Math.abs(this.props.transaction.amount) + " CAD "}
+                    {sign + " "}
+                    {"$" + Math.abs(this.props.transaction.amount).toFixed(2) + " CAD "}
                 </div>
+
+                <div className='date' style={styles.paper.date}>
+                    {this.props.transaction.transactionDate + " "}
+                </div>
+
                 <div className='desc' style={styles.paper.desc}>
-                    Description:
                     {this.props.transaction.description + " "}
                 </div>
-                <div className='runningBalance' style={styles.paper.runningBalance}>
-                    Running Balance:
-                    {"$" + this.props.transaction.runningBalance + " CAD "}
-                </div>
+
                 <div className='category' style={styles.paper.category}>
-                    Category:
-                    {this.props.transaction.category + " "}
+                    {displayNicely(this.props.transaction.category + " ")}
                 </div>
-                <div className='date' style={styles.paper.date}>
-                    Date:
-                    {this.props.transaction.transactionDate + " "}
+
+                <div className='account' style={styles.paper.account}>
+                    {displayNicely(this.props.accountName)}
                 </div>
             </Paper>
         )

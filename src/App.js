@@ -2,10 +2,8 @@ import React, {Component} from 'react';
 
 // material-ui imports
 import CircularProgress from 'material-ui/CircularProgress';
-import {grey200} from 'material-ui/styles/colors';
-import {deepOrange500} from 'material-ui/styles/colors';
+import {grey200, lightGreen500} from 'material-ui/styles/colors';
 import FlatButton from 'material-ui/FlatButton';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
@@ -15,10 +13,13 @@ import IconButton from 'material-ui/IconButton';
 import ActionSwapVert from 'material-ui/svg-icons/action/swap-vert';
 
 var Transaction = require('./Transaction.js');
+var displayNicely = require('./helpers.js');
 
 // Required for tap event
 import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
+
+import './App.css'
 
 const styles = {
   container: {
@@ -27,7 +28,8 @@ const styles = {
     flexDirection: 'column',
   },
   appBar: {
-      fontWeight: 300
+      fontWeight: 300,
+      backgroundColor: lightGreen500,
   },
   clrBtn: {
       width: '100%'
@@ -45,12 +47,6 @@ const styles = {
       fontWeight: 100,
   }
 };
-
-const muiTheme = getMuiTheme({
-  palette: {
-    accent1Color: deepOrange500,
-  },
-});
 
 class App extends Component {
   constructor(props, context) {
@@ -88,6 +84,28 @@ class App extends Component {
 
   }
 
+  toggleDrawer = () => this.setState({drawerOpen: !this.state.drawerOpen});
+
+  toggleFilter = (filter) => {
+      var activeFilters = this.state.activeFilters;
+
+      if (activeFilters.includes(filter)) {
+          activeFilters.splice(activeFilters.indexOf(filter), 1);
+      } else {
+          activeFilters.push(filter);
+      }
+
+      this.setState({activeFilters: activeFilters});
+  }
+
+  clearFilters = () => this.setState({activeFilters: []});
+
+  reorder = () => this.setState({dateDesc: !this.state.dateDesc})
+
+  //-------------------------------------
+  // Utilities
+  //-------------------------------------
+
   filteredTransactions(filters, dateDesc) {
       var filtered = filters.length === 0 ? this.data.transactionData.transactions :
       this.data.transactionData.transactions.filter((transaction) => {
@@ -109,114 +127,102 @@ class App extends Component {
 
   }
 
-  displayNicely(string) {
-      return string.toLowerCase().split('_').join(' ').replace(/\b\w/g, function(l) { return l.toUpperCase() })
+  getAccountName(t, accs) {
+      accs = accs.filter((a) => {
+          return a.accountId === t.accountId
+      });
+      return accs[0].accountName;
   }
-
-  toggleDrawer = () => this.setState({drawerOpen: !this.state.drawerOpen});
-
-  toggleFilter = (filter) => {
-      var activeFilters = this.state.activeFilters;
-
-      if (activeFilters.includes(filter)) {
-          activeFilters.splice(activeFilters.indexOf(filter), 1);
-      } else {
-          activeFilters.push(filter);
-      }
-
-      this.setState({activeFilters: activeFilters});
-  }
-
-  clearFilters = () => this.setState({activeFilters: []});
-
-  reorder = () => this.setState({dateDesc: !this.state.dateDesc})
 
   render() {
     if (this.data === undefined) {
         return (
-          <MuiThemeProvider muiTheme={muiTheme}>
+          <MuiThemeProvider>
             <CircularProgress/>
           </MuiThemeProvider>
         )
     } else {
 
         return (
-          <MuiThemeProvider muiTheme={muiTheme}>
-            <div style={styles.container}>
-            <AppBar
-                className="appBar"
-                style={styles.appBar}
-                title={"My Balance $" + this.data.accounts.map(account => (
-                    account.balance
-                )).reduce((a,b) => a+b, 0) + " CAD"}
-                iconElementRight={<FlatButton label="Filter" onTouchTap={this.toggleDrawer} />}
-                label="Open Drawer"
-            >
-            </AppBar>
-
-            <Drawer
-                style={styles.drawer}
-                docked={false}
-                width={300}
-                open={this.state.drawerOpen}
-                onRequestChange={(drawerOpen) => this.setState({drawerOpen})}
-            >
-
-                <div>
-                    <FlatButton label="Clear" onTouchTap={this.clearFilters} style={styles.clrBtn} />
-                </div>
-                <div className="filterType" style={styles.filterType}>
-                    Accounts
-                </div>
-                <Divider/>
-                {this.data.accounts.map(account => (
-                    <div>
-                        <Checkbox
-                            style={styles.checkbox}
-                            label={this.displayNicely(account.accountName)}
-                            checked={this.state.activeFilters.includes(account.accountId)}
-                            onCheck={() => this.toggleFilter(account.accountId)}
-                            key={account.accountName}
-                        />
-                    </div>
-                ))}
-                <div className="filterType" style={styles.filterType}>
-                    Categories
-                </div>
-                <Divider/>
-
-                {this.data.categories.map(category => (
-                    <div>
-                        <Checkbox
-                            style={styles.checkbox}
-                            label={this.displayNicely(category)}
-                            checked={this.state.activeFilters.includes(category)}
-                            onCheck={() => this.toggleFilter(category)}
-                            key={category}
-                        />
-                    </div>
-                ))}
-
-            </Drawer>
-
-                <IconButton
-                    style={styles.dateSort}
-                    onTouchTap={() => this.reorder()}
+            <div className="App">
+              <MuiThemeProvider>
+                <div style={styles.container}>
+                <AppBar
+                    className="appBar"
+                    style={styles.appBar}
+                    title={"My Balance $" + this.data.accounts.map(account => (
+                        account.balance
+                    )).reduce((a,b) => a+b, 0) + " CAD"}
+                    iconElementRight={<FlatButton label="Filter" onTouchTap={this.toggleDrawer} />}
+                    label="Open Drawer"
                 >
-                    <ActionSwapVert/>
-                </IconButton>
+                </AppBar>
 
-            {console.log(this.filteredTransactions(this.state.activeFilters, this.state.dateDesc))}
-            {this.filteredTransactions(this.state.activeFilters, this.state.dateDesc).map(transaction => (
-                <Transaction
-                    key={transaction.transactionId}
-                    transaction={transaction}
+                <Drawer
+                    style={styles.drawer}
+                    docked={false}
+                    width={300}
+                    open={this.state.drawerOpen}
+                    onRequestChange={(drawerOpen) => this.setState({drawerOpen})}
                 >
-                </Transaction>
 
-              ))}
+                    <div>
+                        <FlatButton label="Clear" className="clrBtn" onTouchTap={this.clearFilters} style={styles.clrBtn} />
+                    </div>
+                    <div className="filterType" style={styles.filterType}>
+                        Accounts
+                    </div>
+                    <Divider/>
+                    {this.data.accounts.map(account => (
+                        <div>
+                            <Checkbox
+                                style={styles.checkbox}
+                                label={displayNicely(account.accountName)}
+                                checked={this.state.activeFilters.includes(account.accountId)}
+                                onCheck={() => this.toggleFilter(account.accountId)}
+                                key={account.accountName}
+                            />
+                        </div>
+                    ))}
+                    <div className="filterType" style={styles.filterType}>
+                        Categories
+                    </div>
+                    <Divider/>
+
+                    {this.data.categories.map(category => (
+                        <div>
+                            <Checkbox
+                                style={styles.checkbox}
+                                label={displayNicely(category)}
+                                checked={this.state.activeFilters.includes(category)}
+                                onCheck={() => this.toggleFilter(category)}
+                                key={category}
+                            />
+                        </div>
+                    ))}
+
+                </Drawer>
+
+                    <IconButton
+                        style={styles.dateSort}
+                        onTouchTap={() => this.reorder()}
+                    >
+                        <ActionSwapVert/>
+                    </IconButton>
+
+                {console.log(this.filteredTransactions(this.state.activeFilters, this.state.dateDesc))}
+                {this.filteredTransactions(this.state.activeFilters, this.state.dateDesc).map(transaction => (
+                    <Transaction
+                        key={transaction.transactionId}
+                        transaction={transaction}
+                        accountName={this.getAccountName(transaction, this.data.accounts)}
+                    >
+                    </Transaction>
+
+                  ))}
+                </div>
+              </MuiThemeProvider>
             </div>
-          </MuiThemeProvider>
         );
     }
   }
