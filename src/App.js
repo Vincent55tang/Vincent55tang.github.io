@@ -14,6 +14,7 @@ import ActionSwapVert from 'material-ui/svg-icons/action/swap-vert';
 
 var Transaction = require('./Transaction.js');
 var displayNicely = require('./helpers.js');
+var MediaQuery = require('react-responsive');
 
 // Required for tap event
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -28,7 +29,6 @@ const styles = {
     flexDirection: 'column',
   },
   appBar: {
-      fontWeight: 300,
       backgroundColor: lightGreen500,
   },
   clrBtn: {
@@ -150,7 +150,7 @@ class App extends Component {
                 <AppBar
                     className="appBar"
                     style={styles.appBar}
-                    title={"My Balance $" + this.data.accounts.map(account => (
+                    title={"$" + this.data.accounts.map(account => (
                         account.balance
                     )).reduce((a,b) => a+b, 0) + " CAD"}
                     iconElementRight={<FlatButton label="Filter" onTouchTap={this.toggleDrawer} />}
@@ -180,6 +180,7 @@ class App extends Component {
                                 label={displayNicely(account.accountName)}
                                 checked={this.state.activeFilters.includes(account.accountId)}
                                 onCheck={() => this.toggleFilter(account.accountId)}
+                                key={account.accountName}
                             />
                         </div>
                     ))}

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Paper from 'material-ui/Paper';
+import Divider from 'material-ui/Divider';
 import {grey500, lightGreen500} from 'material-ui/styles/colors';
 
 var displayNicely = require('./helpers.js');
@@ -53,12 +54,37 @@ const styles = {
 
   }
 
-};
+}
 
 class Transaction extends Component {
 
     constructor(props: Props) {
         super(props);
+        this.months = {
+            "01": "Jan",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Apr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Aug",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dec",
+        }
+    }
+
+    displayDateNicely(date) {
+        date = date.split('-');
+        return (
+            <span>
+                <div> {date[0]} </div>
+                <span className="month"> {this.months[date[1]]} </span>
+                <span> {date[2]} </span>
+            </span>
+        )
     }
 
     render() {
@@ -72,8 +98,10 @@ class Transaction extends Component {
                 </div>
 
                 <div className='date' style={styles.paper.date}>
-                    {this.props.transaction.transactionDate + " "}
+                    {this.displayDateNicely(this.props.transaction.transactionDate)}
                 </div>
+
+                <Divider/>
 
                 <div className='desc' style={styles.paper.desc}>
                     {this.props.transaction.description + " "}
