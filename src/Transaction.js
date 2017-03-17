@@ -111,11 +111,11 @@ class Transaction extends Component {
                 <Divider/>
 
                 <div className='desc' style={styles.paper.desc}>
-                    {this.props.transaction.description + " "}
+                    {this.props.transaction.description || 'No Description'}
                 </div>
 
                 <div className='category' style={styles.paper.category}>
-                    {displayNicely(this.props.transaction.category + " ")}
+                    {displayNicely(this.props.transaction.category || 'No Category')}
                 </div>
 
                 <div className='account' style={styles.paper.account}>
