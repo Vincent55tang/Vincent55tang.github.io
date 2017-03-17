@@ -53,6 +53,8 @@ const styles = {
   },
 };
 
+//-------------------------------------
+// Main app component that displays almost everything
 class App extends Component {
   constructor(props, context) {
     super(props, context);
@@ -72,6 +74,8 @@ class App extends Component {
       this.fetchData();
   }
 
+  //-------------------------------------
+  // Fetches json data from server, only does this once per page load
   fetchData() {
 
       const request = new Request('https://demo7235469.mockable.io/transactions');
@@ -84,6 +88,7 @@ class App extends Component {
           self.setState({transactions: responseJSON.transactionData.transactions});
       })
       .catch((error) => {
+          // Hope no errors occur!
           console.log(error);
       })
 
@@ -91,6 +96,8 @@ class App extends Component {
 
   toggleDrawer = () => this.setState({drawerOpen: !this.state.drawerOpen});
 
+  //-------------------------------------
+  // Fires on checkbox tick to toggle a filter
   toggleFilter = (filter) => {
       var activeFilters = this.state.activeFilters;
 
@@ -111,6 +118,8 @@ class App extends Component {
   // Utilities
   //-------------------------------------
 
+  //-------------------------------------
+  // Applies filters and sorts by date for transactions
   filteredTransactions(filters, dateDesc) {
       var filtered = filters.length === 0 ? this.data.transactionData.transactions :
       this.data.transactionData.transactions.filter((transaction) => {
@@ -171,6 +180,7 @@ class App extends Component {
                     style={styles.appBar}
                     title={title}
                     iconElementRight={<FlatButton label="Filter" onTouchTap={this.toggleDrawer} />}
+                    iconElementLeft={<div></div>}
                     label="Open Drawer"
                 >
                 </AppBar>

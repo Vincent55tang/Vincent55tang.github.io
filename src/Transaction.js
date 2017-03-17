@@ -59,6 +59,8 @@ const styles = {
 
 }
 
+//-------------------------------------
+// Displays data for each transaction on a Paper
 class Transaction extends Component {
 
     constructor(props: Props) {
